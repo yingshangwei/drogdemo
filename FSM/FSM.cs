@@ -119,46 +119,96 @@ public class FSM
     }
 }
 
+
+/// <summary>
+/// 人物的角色状态类
+/// </summary>
 public class IState {
-    SkillData skillData;
-    float StateBeginTime;
-    string name = "";
-    public IState(SkillData newSkillData=null, string newname="") {
-        name = newname;
+    /// <summary>
+    /// 状态数据
+    /// </summary>
+    SkillData StateData;
+    /// <summary>
+    /// 进入状态的时间
+    /// </summary>
+    float StateEnterTime;
+    /// <summary>
+    /// 状态的归属人物的名称
+    /// </summary>
+    string StateMasterName = "";
+    /// <summary>
+    /// 新建状态且初始化
+    /// </summary>
+    /// <param name="newSkillData">状态数据</param>
+    /// <param name="newname">状态归属人的名称</param>
+    public IState(SkillData newStateData=null, string newStateMasterName="") {
+        StateMasterName = newStateMasterName;
         skillData = newSkillData;
-        StateBeginTime = -1000;
+        StateBeginTime = -1000;   //进入该状态的时间初始化为-1000s
     }
+    /// <summary>
+    /// 进入该状态需要做的操作
+    /// </summary>
     public void OnEnter() {
         //播放动画
         //gameObject.GetComponent<Animator>().CrossFade(skillData.SkillAnimationName,0.1f);
+
+        //状态进入需要让视图层做的操作包成事件交给试图层的事件系统
         View.EventHandle += delegate() {
             View.obmp[name].GetComponent<Animator>().CrossFade(skillData.SkillAnimationName,0.1f);
         };
+
+        //进入状态的时间更新
         StateBeginTime = Logic.time;
     }
+    /// <summary>
+    /// 状态更新时的操作
+    /// </summary>
     public void OnUpdate() {
 
     }
+    /// <summary>
+    /// 状态退出时需要做的操作
+    /// </summary>
     public void OnExit() {
     }
+
+    /// <summary>
+    /// 判断当前状态的生命周期是否已经结束
+    /// </summary>
+    /// <returns>当前状态生命周期是否结束</returns>
     public bool IfCanExitTo() {
         if(Logic.time-StateBeginTime>skillData.SkillDuringTime)
             return true;
         else
             return false;
     }
+    /// <summary>
+    /// 判断状态前摇是否结束
+    /// </summary>
+    /// <returns>前摇是否结束</returns>
     public bool IfRollEnd() {
-        if(Logic.time-StateBeginTime<skillData.SkillRollEndTime)
+        if(Logic.time-StateBeginTime<skillData.SkillRollEndTime) {
             return false;
-        else 
+        } else { 
             return true;
+        }
     }
+    /// <summary>
+    /// 判断状态的后摇是否开始
+    /// </summary>
+    /// <returns>后摇是否开始</returns>
     public bool IfShakeBegin() {
-        if(Logic.time-StateBeginTime>skillData.ShakeBackBeginTime)
+        if(Logic.time-StateBeginTime>skillData.ShakeBackBeginTime) {
             return true;
-        else 
+        } else { 
             return false;
+        }
     }
+    /// <summary>
+    /// 获取当前状态的名称
+    /// </summary>
+    /// <returns>当前状态的名称</returns>
     public string GetStateName() {
         return skillData.SkillStateName;
     }

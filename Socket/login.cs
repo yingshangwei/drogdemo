@@ -17,35 +17,28 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class login : MonoBehaviour {
+
+//登录场景
+public class LoginScence : MonoBehaviour {
 
     public GameObject buttonLogin;
     public GameObject buttonRegistered;
     public Client myClient;
     void Start()
     {
-        Client.Init();
+
+
+        //登录场景UI初始化
         buttonLogin = GameObject.Find("Login");
         buttonRegistered = GameObject.Find("Registered");
         buttonLogin.GetComponent<Button>().onClick.AddListener(Login);
         buttonRegistered.GetComponent<Button>().onClick.AddListener(Registered);
-        Client.ifrun = true;
-        Thread thread = new Thread(myClientRecv);
-        thread.IsBackground = true;
-        thread.Name = "Recv";
-        thread.Start();
+        
+        //登录场景客户端初始化与运行
+        Client.Init();    
+        Client.RunAutoRecvThread();
     }
 
-    void myClientRecv() {
-        while(true) {
-            if(!Client.ifrun) {
-                break;
-            }
-            Client.Recv();
-            
-        }
-        Client._ClientSocket.Close();
-    }
 
     void Update() {
         Debug.Log("login sc dataq count " + Client.dataQueue.Count);
